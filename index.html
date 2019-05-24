@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>I NEED TO SEE CATS</title>
+  <meta charset="UTF-8" />
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
+   crossorigin="anonymous"></script>
+  <script
+    src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    crossorigin="anonymous">
+  </script>
+</body>
+
+</html>
+
+<style>
+  body {
+    font-family: sans-serif;
+    text-align: center;
+  }
+
+  img {
+    width: 300px;
+  }
+
+</style>
+
+<script>
+
+  // const $ = require("jquery");
+
+  // Fetching cats from API
+  function fetchCats(currentCount) {
+    // I don't know that this page const's purpose
+    const page = Math.ceil(currentCount / 5);
+    return fetch(
+      `https://api.thecatapi.com/v1/images/search?limit=5&page=${page}&order=Desc`
+    ).then(response => response.json());
+  }
+
+  // this is setting the inslide elements of the DOM #app
+  document.getElementById("app").innerHTML = `
+    <h1>These are cats.</h1>
+    <h2>Cats are cool 😸</h2>
+    <div id="kitties"></div>
+    <button>More cats! 😻</button>
+  `;
+
+  // Initial display count of cat = 1
+  let CatCount = 1,
+    Cats = [];
+
+  function renderCats(cats, count) {
+    // Initialize #kitties as empty DOM
+    $("#kitties").html("");
+
+    // Slicing cats array from beggining to count,
+    // For each cat, append to DOM#kitties as <div><img src="cat.url"></div>
+    cats.slice(0, count).forEach(cat => {
+      $("#kitties").append($("<div>").append($("<img>").attr("src", cat.url)));
+    });
+  }
+
+  // Initial cat fetch
+  fetchCats(CatCount).then(newCats => {
+    Cats = [...Cats, ...newCats];
+    renderCats(Cats, CatCount);
+  });
+
+  $("button").on("click", () => {
+    CatCount += 1;
+
+    // We load 5 cats in JSON. When we run out of 5 cats, we fetch anotehr 5 new cats from API.
+    if (CatCount > Cats.length) {
+      // Fetch more cats when we run out
+      fetchCats(CatCount).then(newCats => {
+        Cats = [...Cats, ...newCats];
+        renderCats(Cats, CatCount);
+      });
+    } else {
+      renderCats(Cats, CatCount);
+    }
+  });
+</script>
